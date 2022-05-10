@@ -114,6 +114,7 @@ function printText() {
 }
 
 function initKeyboard(array) {
+  KEYBOARD_BODY.innerHTML = '';
   array.forEach((row) => {
     const KEYBOARD_ROW = document.createElement('div');
     KEYBOARD_ROW.classList.add('keyboard__row');
@@ -124,35 +125,30 @@ function initKeyboard(array) {
       KEYBOARD_BTN.setAttribute('id', `${row[i].toLowerCase()}`);
       KEYBOARD_ROW.append(KEYBOARD_BTN);
       KEYBOARD_BTN.innerHTML += row[i];
-      // for (let j = 0; j < FUNCTIONAL_BTNS.length; j += 1) {
-      //   if (row[i] === FUNCTIONAL_BTNS[j]) {
-      //     KEYBOARD_BTN.setAttribute('data-id', `${FUNCTIONAL_BTNS[j]}`);
-      //   }
-      // }
       for (let j = 0; j < FUNCTIONAL_BTNS.length; j += 1) {
         if (row[i] === 'RU' || row[i] === 'EN') {
           KEYBOARD_BTN.classList.add('lang-switch');
-          const switchLangBtn = document.querySelector('.lang-switch');
-          switchLangBtn.addEventListener('click', (event) => {
-            switch (event.target.id) {
-              case 'ru':
-                KEYBOARD_BODY.innerHTML = '';
-                initKeyboard(KEYBOARD_RU);
-                printText();
-                lang = 'ru';
-                break;
-              case 'en':
-                KEYBOARD_BODY.innerHTML = '';
-                initKeyboard(KEYBOARD_EN);
-                printText();
-                lang = 'en';
-                break;
-              default:
-                break;
-            }
-          });
         }
       }
+    }
+  });
+  const switchLangBtn = document.querySelector('.lang-switch');
+  switchLangBtn.addEventListener('click', (event) => {
+    switch (event.target.id) {
+      case 'ru':
+        KEYBOARD_BODY.innerHTML = '';
+        initKeyboard(KEYBOARD_RU);
+        printText();
+        lang = 'ru';
+        break;
+      case 'en':
+        KEYBOARD_BODY.innerHTML = '';
+        initKeyboard(KEYBOARD_EN);
+        printText();
+        lang = 'en';
+        break;
+      default:
+        break;
     }
   });
 }
@@ -228,28 +224,6 @@ function toLowLock() {
   }
 }
 
-window.addEventListener('keydown', (e) => {
-  const pressedButton = document.getElementById(`${e.key.toLowerCase()}`);
-  pressedButton.classList.add('active');
-  if (pressedButton.id === 'capslock') {
-    toCapsLock();
-  }
-  if (pressedButton.id === 'shift') {
-    isShiftPressed = true;
-    toShift();
-  }
-});
-
-window.addEventListener('keyup', (e) => {
-  const pressedButton = document.getElementById(`${e.key.toLowerCase()}`);
-  pressedButton.classList.remove('active');
-  if (pressedButton.id === 'shift') {
-    KEYBOARD_BODY.innerHTML = '';
-    isShiftPressed = false;
-    toShift();
-  }
-});
-
 let isClicked = false;
 let isCapslockClicked = false;
 
@@ -286,19 +260,47 @@ window.addEventListener('click', (e) => {
   }
 });
 
+window.addEventListener('keydown', (e) => {
+  const shiftBtn = document.getElementById('shift');
+  const capsLockBtn = document.getElementById('capslock');
+  // pressedButton.classList.add('active');
+  if (capsLockBtn.id === 'capslock') {
+    capsLockBtn.classList.toggle('active');
+    toCapsLock();
+  }
+  if (shiftBtn.id === 'shift') {
+    isShiftPressed = true;
+    toShift();
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  const pressedButton = document.getElementById(`${e.key.toLowerCase()}`);
+  // pressedButton.classList.remove('active');
+  if (pressedButton.id === 'shift') {
+    KEYBOARD_BODY.innerHTML = '';
+    isShiftPressed = false;
+    toShift();
+  }
+});
+
 // Local storage
 
 function setLocalStorage() {
   localStorage.setItem('Language', lang);
+  localStorage.setItem('array_ru', KEYBOARD_RU);
+  localStorage.setItem('array_en', KEYBOARD_EN);
 }
 
 window.addEventListener('beforeunload', setLocalStorage);
 
 function getLocalStorage() {
-  if (localStorage.getItem('Language')) {
-    lang = localStorage.getItem('Language');
-    return lang;
+  lang = localStorage.getItem('Language');
+  if (lang === 'en') {
+    return initKeyboard(KEYBOARD_EN);
   }
+  return initKeyboard(KEYBOARD_RU);
 }
 
 window.addEventListener('load', getLocalStorage);
+window.addEventListener('load', printText);
