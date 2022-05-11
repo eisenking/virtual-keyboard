@@ -40,7 +40,7 @@ TITLE.textContent = 'RSS Virtual Keyboard';
 
 const EPILOGUE = document.createElement('h3');
 EPILOGUE.classList.add('epilogue');
-EPILOGUE.innerHTML = 'Привет! <br> Клавиатура сделана на Windows, язык переключает кнопка EN(RU). <br> Я пока не смог связать физическую клавиатуру и реальную <br> Пожалуйста, если Вас не затруднит, проверьте мою работу как можно позже) мой дискорд для связи - niceracer#1693 <br> Заранее спасибо и хорошего Вам дня!';
+EPILOGUE.innerHTML = 'Привет! <br> Клавиатура сделана на Windows <br> Язык переключает кнопка EN(RU) и LeftShift + LeftAlt <br> Ввод с клавиатуры только при клике на Textarea <br> Подсветки при вводе с физ.клавиатуры нет <br> Eslint вроде не ругается, фишки ES6 - let, const, ()=> <br> <a href="">Ссылка на Pull Request </a> <br> мой дискорд для связи - niceracer#1693 <br> Заранее спасибо и хорошего Вам дня!';
 
 const TEXTAREA = document.createElement('textarea');
 TEXTAREA.className = 'textarea';
@@ -60,7 +60,7 @@ KEYBOARD.append(EPILOGUE);
 
 let lang = 'en';
 let isCaps = false;
-let isShiftPressed = false;
+// let isShiftPressed = false;
 
 function printText() {
   document.querySelectorAll('.keyboard__btn').forEach((btn) => {
@@ -132,6 +132,16 @@ function initKeyboard(array) {
       }
     }
   });
+  switch (lang) {
+    case 'ru':
+      lang = 'ru';
+      break;
+    case 'en':
+      lang = 'en';
+      break;
+    default:
+      break;
+  }
   const switchLangBtn = document.querySelector('.lang-switch');
   switchLangBtn.addEventListener('click', (event) => {
     switch (event.target.id) {
@@ -163,23 +173,23 @@ if (lang === 'ru') {
 
 printText();
 
-function toShift() {
-  if (isShiftPressed === true && lang === 'en') {
-    KEYBOARD_BODY.innerHTML = '';
-    initKeyboard(KEYBOARD_EN_SHIFT);
-    printText();
-  } else if (isShiftPressed === true && lang === 'ru') {
-    KEYBOARD_BODY.innerHTML = '';
-    initKeyboard(KEYBOARD_RU_SHIFT);
-    printText();
-  } else if (isShiftPressed === false && lang === 'en') {
-    initKeyboard(KEYBOARD_EN);
-    printText();
-  } else if (isShiftPressed === false && lang === 'ru') {
-    initKeyboard(KEYBOARD_RU);
-    printText();
-  }
-}
+// function toShift() {
+//   if (isShiftPressed === true && lang === 'en') {
+//     KEYBOARD_BODY.innerHTML = '';
+//     initKeyboard(KEYBOARD_EN_SHIFT);
+//     printText();
+//   } else if (isShiftPressed === true && lang === 'ru') {
+//     KEYBOARD_BODY.innerHTML = '';
+//     initKeyboard(KEYBOARD_RU_SHIFT);
+//     printText();
+//   } else if (isShiftPressed === false && lang === 'en') {
+//     initKeyboard(KEYBOARD_EN);
+//     printText();
+//   } else if (isShiftPressed === false && lang === 'ru') {
+//     initKeyboard(KEYBOARD_RU);
+//     printText();
+//   }
+// }
 
 function toCapsLock() {
   if (isCaps === false) {
@@ -278,22 +288,31 @@ window.addEventListener('click', (e) => {
 });
 
 // window.addEventListener('keydown', (e) => {
-//   const shiftBtn = document.getElementById('shift');
-//   const capsLockBtn = document.getElementById('capslock');
-//   // pressedButton.classList.add('active');
-//   if (capsLockBtn.id === 'capslock') {
-//     capsLockBtn.classList.toggle('active');
-//     toCapsLock();
-//   }
-//   if (shiftBtn.id === 'shift') {
-//     isShiftPressed = true;
-//     toShift();
+//   console.log('yay');
+//   const allBtns = document.querySelectorAll('.keyboard__btn');
+//   console.log(allBtns);
+//   allBtns.forEach((btn) => {
+//     btn.classList.add('btn');
+//     // btn.setAttribute('code', `${e.code}`);
+//   });
+//   if (e.target.classList.contains('btn') === true) {
+//     const pressedButton = document.getElementById(`${e.key.toLowerCase()}`);
+//     console.log(pressedButton);
+//     console.log(pressedButton.innerText);
+//     pressedButton.classList.add('active');
+//     if (pressedButton.id === 'capslock') {
+//       toCapsLock();
+//     }
+//     if (pressedButton.id === 'shift') {
+//       isShiftPressed = true;
+//       toShift();
+//     }
 //   }
 // });
 
-// window.addEventListener('keyup', (e) => {
+// KEYBOARD.addEventListener('keyup', (e) => {
 //   const pressedButton = document.getElementById(`${e.key.toLowerCase()}`);
-//   // pressedButton.classList.remove('active');
+//   pressedButton.classList.remove('active');
 //   if (pressedButton.id === 'shift') {
 //     KEYBOARD_BODY.innerHTML = '';
 //     isShiftPressed = false;
@@ -321,3 +340,50 @@ function getLocalStorage() {
 
 window.addEventListener('load', getLocalStorage);
 window.addEventListener('load', printText);
+
+// смена языка на две кнопки
+
+function runOnKeys(func, ...codes) {
+  const pressedBtns = new Set();
+  window.addEventListener('keydown', (event) => {
+    pressedBtns.add(event.code);
+    for (let i = 0; i < codes.length; i += 1) {
+      if (!pressedBtns.has(codes[i])) {
+        return;
+      }
+    }
+    pressedBtns.clear();
+    // func();
+    if (lang === 'en') {
+      lang = 'ru';
+      initKeyboard(KEYBOARD_RU);
+    } else if (lang === 'ru') {
+      lang = 'en';
+      initKeyboard(KEYBOARD_EN);
+    }
+    printText();
+  });
+
+  window.addEventListener('keyup', (event) => {
+    pressedBtns.delete(event.code);
+  });
+}
+
+switch (lang) {
+  case 'en':
+    runOnKeys(
+      () => initKeyboard(KEYBOARD_RU),
+      'ShiftLeft',
+      'AltLeft',
+    );
+    break;
+  case 'ru':
+    runOnKeys(
+      () => initKeyboard(KEYBOARD_EN),
+      'ShiftLeft',
+      'AltLeft',
+    );
+    break;
+  default:
+    break;
+}
