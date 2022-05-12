@@ -40,7 +40,7 @@ TITLE.textContent = 'RSS Virtual Keyboard';
 
 const EPILOGUE = document.createElement('h3');
 EPILOGUE.classList.add('epilogue');
-EPILOGUE.innerHTML = 'Привет! <br> Клавиатура сделана на Windows <br> Язык переключает кнопка EN(RU) и LeftShift + LeftAlt <br> Ввод с клавиатуры только при клике на Textarea <br> Подсветки при вводе с физ.клавиатуры нет <br> Eslint вроде не ругается, фишки ES6 - let, const, ()=> <br> <a href="">Ссылка на Pull Request </a> <br> мой дискорд для связи - niceracer#1693 <br> Заранее спасибо и хорошего Вам дня!';
+EPILOGUE.innerHTML = 'Привет! <br> Клавиатура сделана на Windows <br> Язык переключает кнопка EN(RU) и LeftShift + LeftAlt <br> Ввод с клавиатуры только при клике на Textarea <br> Подсветки при вводе с физ.клавиатуры нет <br> Eslint вроде не ругается, фишки ES6 - let, const, ()=> <br> <a href="https://github.com/eisenking/virtual-keyboard/pull/2">Ссылка на Pull Request </a> <br> мой дискорд для связи - niceracer#1693 <br> Заранее спасибо и хорошего Вам дня!';
 
 const TEXTAREA = document.createElement('textarea');
 TEXTAREA.className = 'textarea';
